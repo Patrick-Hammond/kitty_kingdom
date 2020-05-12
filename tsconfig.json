@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "sourceMap": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "target": "es5",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "baseUrl": "./src/",
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@breakspace/*":["../node_modules/breakspace/src/breakspace/*"],
+      "@lib/*":["../node_modules/breakspace/src/_lib/*"]
+    }
+  },
+  "exclude": ["node_modules", "webpack.config.ts", "webwebpack.prod.config.ts"]
+}
