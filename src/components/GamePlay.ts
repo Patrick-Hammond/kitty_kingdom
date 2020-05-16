@@ -2,7 +2,7 @@ import GameComponent from "@breakspace/GameComponent";
 import { CAT_HOME_PLAYER, CAT_HOME_VIKING, NEXT_ROUND, ROUND_FINISHED } from "../GameEvents";
 import Cat from "./cat/Cat";
 
-export default class ScoreKeeper extends GameComponent {
+export default class GamePlay extends GameComponent {
 
     private catsHomePlayer: number;
     private catsHomeViking: number;
@@ -25,9 +25,10 @@ export default class ScoreKeeper extends GameComponent {
     }
 
     private OnCatHome(home: "player" | "viking", cat: Cat) : void {
+
         home === "player" ? this.catsHomePlayer++ : this.catsHomeViking++;
 
-        if(this.catsHomePlayer + this.catsHomeViking === 5) {
+        if(this.catsHomePlayer === 6 || this.catsHomeViking === 6) {
 
             const playerWon = this.catsHomePlayer > this.catsHomeViking;
 

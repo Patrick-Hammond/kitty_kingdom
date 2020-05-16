@@ -4,7 +4,7 @@ import { Vec2Like, Vec2 } from "@lib/math/Geometry";
 import { Sprite } from "pixi.js";
 import ObjectPool from "@lib/patterns/ObjectPool";
 import AssetFactory from "@breakspace/loading/AssetFactory";
-import { TileToPixel } from "./Map";
+import { TileToPixel } from "../map/Map";
 import { RemoveFromParent } from "@breakspace/display/Utils";
 
 export default class Springs extends GameComponent {

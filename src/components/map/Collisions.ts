@@ -1,9 +1,9 @@
 import GameComponent from "@breakspace/GameComponent";
 import {Vec2, Vec2Like} from "@lib/math/Geometry";
-import Player from "./player/Player";
-import {PLAYER_MOVED, VIKING_MOVED} from "../GameEvents";
-import Cats from "./cat/Cats";
-import Viking from "./viking/Viking";
+import Player from "../player/Player";
+import {PLAYER_MOVED, VIKING_MOVED} from "../../GameEvents";
+import Cats from "../cat/Cats";
+import Viking from "../viking/Viking";
 import { Queue } from "@lib/datastructures/Queue";
 
 export default class Collisions extends GameComponent {
@@ -41,6 +41,8 @@ export default class Collisions extends GameComponent {
         if(playerChasing && Math.random() > 0.6) {
             this.viking.DropSpring();
         }
+
+        this.viking.SetListenerPosition(this.player.Position);
     }
 
     private CheckCollisionWithCat(position: Vec2): void {

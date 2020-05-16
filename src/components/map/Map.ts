@@ -2,7 +2,7 @@ import {ISearchGraph, SearchNode} from "@lib/algorithms/PathSearch";
 import GameComponent from "@breakspace/GameComponent";
 import {Vec2Like, Vec2} from "@lib/math/Geometry";
 import {Direction} from "@lib/utils/Types";
-import {PathTileType} from "../Constants";
+import {PathTileType} from "../../Constants";
 import TileMapModel, { Tile as ITile, Layer as ILayer } from "@breakspace/loading/tilemap/TiledJson";
 import { Texture } from "pixi.js";
 

@@ -21,9 +21,12 @@ export default class TitlePage extends GameComponent {
 
     protected OnShow(): void {
         this.background.once("pointerup", this.Hide, this);
+        this.game.sound.PlaySprite("sounds", "theme");
+
     }
 
     private Hide(): void {
+        this.game.sound.StopSprite("sounds", "theme");
         RemoveFromParent(this.root);
         this.game.dispatcher.emit(TITLE_SCREEN_CLOSED);
     }

@@ -3,7 +3,7 @@ import {RenderTexture, Sprite} from "pixi.js";
 import GameComponent from "@breakspace/GameComponent";
 import {RGB} from "@lib/utils/Types";
 import {CAT_HOME_VIKING, NEXT_ROUND} from "../../GameEvents";
-import { VikingHomeLocation, TileToPixel } from "components/Map";
+import { VikingHomeLocation, TileToPixel } from "components/map/Map";
 
 export default class HomeViking extends GameComponent {
 
@@ -43,6 +43,8 @@ export default class HomeViking extends GameComponent {
             this.root.addChild(cat);
 
             this.catCount++;
+
+            this.game.sound.PlaySprite("sounds", "lose");
         }
     }
 

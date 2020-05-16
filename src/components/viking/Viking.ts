@@ -9,9 +9,10 @@ import {Cancel, Wait} from "@lib/utils/Timing";
 import {Direction} from "@lib/utils/Types";
 import {PathTileType} from "../../Constants";
 import {CAT_FOLLOWING, VIKING_MOVED, CAT_POSITIONS, ROUND_FINISHED, NEXT_ROUND} from "../../GameEvents";
-import {TileToPixel, VikingHomeLocation, VikingWayPoints} from "./../Map";
-import Map from "../Map";
-import Springs from "../Springs";
+import {TileToPixel, VikingHomeLocation, VikingWayPoints} from "../map/Map";
+import Map from "../map/Map";
+import Springs from "../items/Springs";
+import { SoundInstance } from "breakspace/src/breakspace/sound/Sound";
 
 enum VikingState {
     PATROLLING, END_PATROL, GOING_HOME, FALLING, DISABLED
@@ -26,6 +27,7 @@ export default class Viking extends GameComponent {
     private cancelDelayedPatrol: Cancel = NullFunction;
     private patrolIndex: number = -1;
     private springs: Springs;
+    private gallopSound: SoundInstance;
 
     public constructor(private map: Map) {
         super();
@@ -39,6 +41,9 @@ export default class Viking extends GameComponent {
         this.root.addChild(this.anim);
 
         this.springs = new Springs();
+
+        this.gallopSound = this.game.sound.PlaySprite("sounds", "horse");
+        this.gallopSound.volume = 0;
 
         this.game.dispatcher.on(CAT_FOLLOWING, this.OnCatFollowing, this);
         this.game.dispatcher.on(CAT_POSITIONS, (cats) => this.catPositions = cats);
@@ -64,12 +69,26 @@ export default class Viking extends GameComponent {
 
         this.position.Copy(this.map.GetRandomPosition());
         const pos = TileToPixel(this.position);
-        gsap.to(this.anim, 0.75, {x: pos.x, y: pos.y - 400, ease: Power3.easeOut});
-        gsap.to(this.anim, 1, {x: pos.x, y: pos.y, delay: 0.75, ease: Power3.easeIn, onComplete: () => this.ChaseCat()});
+        gsap.to(this.anim, 1, {x: pos.x, y: pos.y - 400, ease: Power3.easeOut});
+        gsap.to(this.anim.scale, 1, {x: 2, y: 2, yoyo: true, repeat: 1, ease: Power3.easeOut});
+        gsap.to(this.anim, 1, {x: pos.x, y: pos.y, delay: 1, ease: Power3.easeIn,
+            onComplete: () => {
+                this.ChaseCat();
+                this.anim.rotation = 0;
+            }
+        });
+        gsap.to(this.anim, 1.75, {rotation: Math.PI * 6});
+        this.game.sound.PlaySprite("sounds", "boing");
     }
 
     DropSpring() : void {
         this.springs.Drop(this.position, 1);
+    }
+
+    SetListenerPosition(position: Vec2): void {
+        const distance = Math.abs(position.length - this.position.length) / 10;
+        const volume = distance > 1 ? 0 : 1 - Math.sqrt(distance);
+        this.gallopSound.volume = volume;
     }
 
     private OnCatFollowing(target: Vec2): void {

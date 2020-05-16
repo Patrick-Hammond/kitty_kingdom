@@ -1,7 +1,7 @@
 import GameComponent from "@breakspace/GameComponent";
 import ObjectPool from "@lib/patterns/ObjectPool";
 import Cat from "./Cat";
-import Map from "../Map";
+import Map from "../map/Map";
 import {CAT_POSITIONS, CAT_HOME_PLAYER, CAT_HOME_VIKING, NEXT_ROUND} from "../../GameEvents";
 import { GetInterval, Wait } from "@lib/utils/Timing";
 import { Vec2Like } from "@lib/math/Geometry";
@@ -37,7 +37,7 @@ export default class Cats extends GameComponent {
     }
 
     private DispatchNext(): void {
-        if(this.catDispatched < 6) {
+        if(this.catDispatched < 11) {
             this.cats.Get().Start();
             this.catDispatched++;
         }

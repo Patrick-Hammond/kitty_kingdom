@@ -2,16 +2,15 @@ import GameComponent from "@breakspace/GameComponent";
 import Camera from "breakspace/src/breakspace/display/Camera";
 import HomePlayer from "./components/player/HomePlayer";
 import HomeViking from "./components/viking/HomeViking";
-import Map, {PlayerHomeLocation, VikingHomeLocation}  from "./components/Map";
+import Map, {PlayerHomeLocation, VikingHomeLocation}  from "./components/map/Map";
 import Player from "./components/player/Player";
 import Viking from "./components/viking/Viking";
-import Collisions from "./components/Collisions";
+import Collisions from "./components/map/Collisions";
 import Cats from "./components/cat/Cats";
-import {Scenes, AssetPath, GameHeight, GameWidth} from "./Constants";
-import ScoreKeeper from "./components/ScoreKeeper";
-import { TITLE_SCREEN_CLOSED, ROUND_FINISHED, NEXT_ROUND } from "./GameEvents";
+import {Scenes, AssetPath, GameHeight, GameWidth, GameScale} from "./Constants";
+import GamePlay from "./components/GamePlay";
+import { TITLE_SCREEN_CLOSED } from "./GameEvents";
 import TileMapRenderer from "@breakspace/display/TileMapRenderer";
-// import { KawaseBlurFilter } from "pixi-filters";
 import Game from "@breakspace/Game";
 import TitlePage from "./components/scenes/TitlePage";
 import Summary from "./components/scenes/Summary";
@@ -38,6 +37,7 @@ export default class Main extends GameComponent {
 
         game.loader.add(AssetPath + "spritesheet.json");
         game.loader.add(AssetPath + "numbers-export.fnt");
+        game.loader.add(AssetPath + "sounds/sounds.json");
         game.loader.load(() => {
             LoadTileMap('level2', AssetPath + 'level2.json')
                 .then((map: TileMapModel) => {
@@ -56,14 +56,12 @@ export default class Main extends GameComponent {
         });
 
         game.dispatcher.once(TITLE_SCREEN_CLOSED, this.Start, this);
-        game.dispatcher.on(ROUND_FINISHED, this.OnRoundFinished, this);
-        game.dispatcher.on(NEXT_ROUND, this.OnNextRound, this);
     }
 
     protected OnInitialise(): void {
 
         const bounds = new Rectangle(0, 0, this.mapModel.width * this.mapModel.tilewidth, this.mapModel.height * this.mapModel.tileheight);
-        this.camera = new Camera({x: GameWidth, y: GameHeight}, 0.4, bounds);
+        this.camera = new Camera({x: GameWidth, y: GameHeight}, GameScale, bounds);
 
         this.map = new Map(this.mapModel);
         this.mapRenderer = new TileMapRenderer(this.mapModel, this.camera);
@@ -78,7 +76,10 @@ export default class Main extends GameComponent {
 
         new Collisions(this.player, this.viking, this.cats);
 
-        new ScoreKeeper();
+        new GamePlay();
+
+        const ambiance = this.game.sound.PlaySprite("sounds", "ambiance");
+        ambiance.volume = 0.05;
 
         this.root.addChild(this.mapRenderer);
         this.mapRenderer.addChild(
@@ -101,15 +102,6 @@ export default class Main extends GameComponent {
 
     private OnUpdate(): void {
         this.player.OnUpdate();
-    }
-
-    private OnRoundFinished(): void {
-        // this.mapRenderer.filters = [this.blur];
-        // this.mapRenderer.filterArea.copyFrom(this.game.screen);
-    }
-
-    private OnNextRound(): void {
-        // this.mapRenderer.filters = null;
     }
 }
 

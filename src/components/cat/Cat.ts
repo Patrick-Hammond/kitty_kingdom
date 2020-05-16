@@ -6,10 +6,10 @@ import {RemoveFromParent, Callback} from "@breakspace/display/Utils";
 import GameComponent from "@breakspace/GameComponent";
 import {Vec2, Vec2Like} from "@lib/math/Geometry";
 import {Wait} from "@lib/utils/Timing";
-import {PlayerHomeLocation, VikingHomeLocation} from "../Map";
+import {PlayerHomeLocation, VikingHomeLocation} from "../map/Map";
 import {CAT_FOLLOWING, CAT_HOME_PLAYER, CAT_HOME_VIKING, CAT_MOVED} from "../../GameEvents";
-import {TileToPixel} from "./../Map";
-import Map from "../Map";
+import {TileToPixel} from "../map/Map";
+import Map from "../map/Map";
 
 enum CatState {
     FALLING, ACTIVE, HOME
@@ -56,6 +56,7 @@ export default class Cat extends GameComponent {
                 if(startFollowing) {
                     this.MoveToFollowTarget();
                 }
+                this.game.sound.PlaySprite("sounds", "meow2");
             }
             this.game.dispatcher.emit(CAT_FOLLOWING, target);
         }
@@ -124,6 +125,7 @@ export default class Cat extends GameComponent {
         const homeViking = this.position.Equals(VikingHomeLocation);
         const isHome = homePlayer || homeViking;
         if (isHome) {
+            Wait(200, () => this.game.sound.PlaySprite("sounds", "meow1"));
             this.state = CatState.HOME;
             this.Destroy();
             this.game.dispatcher.emit(homePlayer ? CAT_HOME_PLAYER : CAT_HOME_VIKING,
