@@ -13,6 +13,7 @@ import {TileToPixel, VikingHomeLocation, VikingWayPoints} from "../map/Map";
 import Map from "../map/Map";
 import Springs from "../items/Springs";
 import { SoundInstance } from "breakspace/src/breakspace/sound/Sound";
+import { RandomInt } from "breakspace/src/_lib/math/Utils";
 
 enum VikingState {
     PATROLLING, END_PATROL, GOING_HOME, FALLING, DISABLED
@@ -28,6 +29,7 @@ export default class Viking extends GameComponent {
     private patrolIndex: number = -1;
     private springs: Springs;
     private gallopSound: SoundInstance;
+    private speed: number = 0.75;
 
     public constructor(private map: Map) {
         super();
@@ -70,7 +72,9 @@ export default class Viking extends GameComponent {
         this.position.Copy(this.map.GetRandomPosition());
         const pos = TileToPixel(this.position);
         gsap.to(this.anim, 1, {x: pos.x, y: pos.y - 400, ease: Power3.easeOut});
-        gsap.to(this.anim.scale, 1, {x: 2, y: 2, yoyo: true, repeat: 1, ease: Power3.easeOut});
+
+        const s = this.anim.scale.x * 2;
+        gsap.to(this.anim.scale, 1, {x: s, y: s, yoyo: true, repeat: 1, ease: Power3.easeOut});
         gsap.to(this.anim, 1, {x: pos.x, y: pos.y, delay: 1, ease: Power3.easeIn,
             onComplete: () => {
                 this.ChaseCat();
@@ -81,6 +85,11 @@ export default class Viking extends GameComponent {
         this.game.sound.PlaySprite("sounds", "boing");
     }
 
+    HitIceblock(): void {
+        this.speed *= 0.5;
+        Wait(5000, () => this.speed = 0.75);
+    }
+
     DropSpring() : void {
         this.springs.Drop(this.position, 1);
     }
@@ -89,6 +98,11 @@ export default class Viking extends GameComponent {
         const distance = Math.abs(position.length - this.position.length) / 10;
         const volume = distance > 1 ? 0 : 1 - Math.sqrt(distance);
         this.gallopSound.volume = volume;
+
+        if(Math.random() > 0.93) {
+            const neigh = this.game.sound.PlaySprite("sounds", "neigh" + RandomInt(1, 2));
+            neigh.volume = volume;
+        }
     }
 
     private OnCatFollowing(target: Vec2): void {
@@ -133,6 +147,7 @@ export default class Viking extends GameComponent {
     }
 
     private MoveTo(x: number, y: number, onComplete?: () => void): void {
+
         const path = FindShortestPath(this.map, this.position, {x, y});
         if(path && path.length > 1) {
             const p = path[1];
@@ -177,7 +192,7 @@ export default class Viking extends GameComponent {
                 }
 
             const pos = TileToPixel(this.position);
-            gsap.to(this.anim, .75, {x: pos.x, y: pos.y, ease: Linear.easeNone, onComplete: () => {
+            gsap.to(this.anim, this.speed, {x: pos.x, y: pos.y, ease: Linear.easeNone, onComplete: () => {
                 if(this.state === VikingState.END_PATROL) {
                     this.GoHome();
                 } else {
@@ -201,6 +216,7 @@ export default class Viking extends GameComponent {
     }
 
     private OnNextRound(): void {
+        this.springs.Reset();
         this.cancelDelayedPatrol();
         gsap.killTweensOf(this.anim);
 

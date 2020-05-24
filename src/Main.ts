@@ -9,7 +9,7 @@ import Collisions from "./components/map/Collisions";
 import Cats from "./components/cat/Cats";
 import {Scenes, AssetPath, GameHeight, GameWidth, GameScale} from "./Constants";
 import GamePlay from "./components/GamePlay";
-import { TITLE_SCREEN_CLOSED } from "./GameEvents";
+import { TITLE_SCREEN_CLOSED, SOUND_SCREEN_CLOSED } from "./GameEvents";
 import TileMapRenderer from "@breakspace/display/TileMapRenderer";
 import Game from "@breakspace/Game";
 import TitlePage from "./components/scenes/TitlePage";
@@ -17,6 +17,8 @@ import Summary from "./components/scenes/Summary";
 import { LoadTileMap } from "@breakspace/loading/tilemap/TileMapLoader";
 import TileMapModel from "@breakspace/loading/tilemap/TiledJson";
 import { Rectangle } from "breakspace/src/_lib/math/Geometry";
+import SoundSelect from "components/scenes/SoundSelect";
+import Iceblocks from "components/items/Iceblocks";
 
 export default class Main extends GameComponent {
 
@@ -29,8 +31,7 @@ export default class Main extends GameComponent {
     private viking: Viking;
     private vikingHome: HomeViking;
     private cats: Cats;
-
-    // private blur = new KawaseBlurFilter(4, 5);
+    private iceblocks: Iceblocks;
 
     constructor(game: Game) {
         super();
@@ -44,23 +45,26 @@ export default class Main extends GameComponent {
 
                     this.mapModel = map;
 
+                    game.sceneManager.AddScene(Scenes.SOUND, new SoundSelect());
                     game.sceneManager.AddScene(Scenes.TITLE, new TitlePage());
                     game.sceneManager.AddScene(Scenes.GAME, this);
                     game.sceneManager.AddScene(Scenes.SUMMARY, new Summary());
 
-                    game.sceneManager.ShowScene(Scenes.TITLE);
+                    game.sceneManager.ShowScene(Scenes.SOUND);
                 })
                 .catch((error: Error) => {
                     throw(error);
                 });
         });
 
-        game.dispatcher.once(TITLE_SCREEN_CLOSED, this.Start, this);
+        game.dispatcher.once(SOUND_SCREEN_CLOSED, this.ShowTitle, this);
     }
 
     protected OnInitialise(): void {
 
-        const bounds = new Rectangle(0, 0, this.mapModel.width * this.mapModel.tilewidth, this.mapModel.height * this.mapModel.tileheight);
+        const mapWidth = this.mapModel.width * this.mapModel.tilewidth;
+        const mapHeight = this.mapModel.height * this.mapModel.tileheight;
+        const bounds = mapHeight <= GameHeight && mapWidth <= GameWidth ? new Rectangle(0, 0, mapWidth, mapHeight) : null;
         this.camera = new Camera({x: GameWidth, y: GameHeight}, GameScale, bounds);
 
         this.map = new Map(this.mapModel);
@@ -74,19 +78,26 @@ export default class Main extends GameComponent {
 
         this.cats = new Cats(this.map);
 
-        new Collisions(this.player, this.viking, this.cats);
+        this.iceblocks = new Iceblocks(this.map);
+
+        new Collisions(this.player, this.viking, this.cats, this.iceblocks);
 
         new GamePlay();
 
         const ambiance = this.game.sound.PlaySprite("sounds", "ambiance");
-        ambiance.volume = 0.05;
+        ambiance.volume = 0.01;
 
         this.root.addChild(this.mapRenderer);
         this.mapRenderer.addChild(
             this.player.Springs.root, this.viking.Springs.root,
-            this.cats.root, this.viking.root, this.player.root,
+            this.cats.root, this.viking.root, this.player.root, this.iceblocks.root,
             this.playerHome.root, this.vikingHome.root
         );
+    }
+
+    private ShowTitle(): void {
+        this.game.sceneManager.ShowScene(Scenes.TITLE);
+        this.game.dispatcher.once(TITLE_SCREEN_CLOSED, this.Start, this);
     }
 
     private Start(): void {

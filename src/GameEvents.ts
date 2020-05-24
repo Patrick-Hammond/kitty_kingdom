@@ -1,4 +1,6 @@
+export const ROUND_SCREEN_CLOSED = "roundScreenClosed";
 export const TITLE_SCREEN_CLOSED = "titleScreenClosed";
+export const SOUND_SCREEN_CLOSED = "soundScreenClosed";
 export const CAT_FOUND       = "catFound";
 export const CAT_HOME_PLAYER = "catHomePlayer";
 export const CAT_HOME_VIKING = "catHomeViking";

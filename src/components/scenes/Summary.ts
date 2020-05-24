@@ -56,6 +56,7 @@ export default class Summary extends GameComponent {
         this.playerText.text = playerRoundsWon;
         this.vikingText.text = vikingRoundsWon;
 
+        this.game.gamePad.WaitForButton(0, 0, this.Hide, this);
         this.background.once("pointerup", this.Hide, this);
     }
 

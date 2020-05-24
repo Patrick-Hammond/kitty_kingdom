@@ -6,5 +6,5 @@ export const PathTileType = 0;
 export const AssetPath = "/assets/";
 
 export const enum Scenes {
-    TITLE = "title", GAME = "game", SUMMARY = "summary"
+    SOUND = "sound", TITLE = "title", GAME = "game", ROUND = "round", SUMMARY = "summary"
 }

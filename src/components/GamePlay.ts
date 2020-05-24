@@ -4,6 +4,7 @@ import Cat from "./cat/Cat";
 
 export default class GamePlay extends GameComponent {
 
+    // private roundNumber: number = 0;
     private catsHomePlayer: number;
     private catsHomeViking: number;
     private playerRoundsWon: number;

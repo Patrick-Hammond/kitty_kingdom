@@ -40,6 +40,10 @@ export default class Springs extends GameComponent {
         return hit != null;
     }
 
+    Reset(): void {
+        this.springPool.Popped.forEach(spring => this.Restore(spring));
+    }
+
     private Restore(spring: Spring): void {
         RemoveFromParent(spring);
         this.springPool.Put(spring);

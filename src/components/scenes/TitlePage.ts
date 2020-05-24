@@ -1,28 +1,31 @@
 import GameComponent from "@breakspace/GameComponent";
-import { Sprite, Rectangle } from "pixi.js";
+import { Sprite } from "pixi.js";
 import { TITLE_SCREEN_CLOSED } from "../../GameEvents";
+import LabelButton from "@breakspace/display/ui/LabelButton";
 import { CenterScreen, RemoveFromParent } from "@breakspace/display/Utils";
 
 export default class TitlePage extends GameComponent {
 
     private background : Sprite;
+    private startButton: LabelButton;
 
     constructor() {
         super();
 
         this.background = this.assetFactory.CreateSprite("title");
-        this.background.hitArea = new Rectangle(574, 508, 188, 121);
-        this.background.interactive = true;
-        this.background.buttonMode = true;
         CenterScreen(this.background);
 
-        this.root.addChild(this.background);
+        this.startButton = new LabelButton("button", "play_label");
+        this.startButton.position.set(794, 592);
+        this.startButton.Enabled = true;
+
+        this.root.addChild(this.background, this.startButton);
     }
 
     protected OnShow(): void {
-        this.background.once("pointerup", this.Hide, this);
+        this.game.gamePad.WaitForButton(0, 0, this.Hide, this);
+        this.startButton.once("pointertap", this.Hide, this);
         this.game.sound.PlaySprite("sounds", "theme");
-
     }
 
     private Hide(): void {

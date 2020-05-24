@@ -17,7 +17,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
-      title: 'Enchant',
+      title: 'Kitty Kingdom',
       template: './assets/index.template'
     }),
     new CopyWebpackPlugin([{ from: './assets', to: 'assets' }]),

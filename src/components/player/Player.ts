@@ -11,6 +11,9 @@ import Springs from "../items/Springs";
 import PlayerControl from "./PlayerControl";
 import { PathTileType } from "Constants";
 import { SoundInstance } from "breakspace/src/breakspace/sound/Sound";
+import { Wait } from "breakspace/src/_lib/utils/Timing";
+import { NullFunction } from "breakspace/src/_lib/patterns/FunctionUtils";
+import { ColorReplaceFilter } from "pixi-filters";
 
 enum PlayerState {
     IDLE, MOVING, FALLING, DISABLED
@@ -24,6 +27,9 @@ export default class Player extends GameComponent {
     private state: PlayerState;
     private springs: Springs;
     private gallopSound: SoundInstance;
+    private speed: number = 0.5;
+    private speedCancel = NullFunction;
+    private speedFilter = new ColorReplaceFilter(0x85b800, 0xb81600);
 
     public constructor(private map: Map, private camera: Camera) {
         super();
@@ -78,10 +84,22 @@ export default class Player extends GameComponent {
                 this.anim.rotation = 0;
             }
         });
-        gsap.to(this.anim.scale, 1, {x: 2, y: 2, yoyo: true, repeat: 1, ease: Power3.easeOut});
+
+        const s = this.anim.scale.x * 2;
+        gsap.to(this.anim.scale, 1, {x: s, y: s, yoyo: true, repeat: 1, ease: Power3.easeOut});
         gsap.to(this.camera, 1, {scale: 1, yoyo: true, repeat: 1, ease: Power3.easeOut});
 
         this.game.sound.PlaySprite("sounds", "boing");
+    }
+
+    HitIceblock(): void {
+        this.speedCancel();
+        this.speed = 0.2;
+        this.anim.filters = [this.speedFilter];
+        this.speedCancel = Wait(10000, () => {
+            this.speed = 0.5;
+            this.anim.filters = null;
+        });
     }
 
     OnUpdate(): void {
@@ -121,7 +139,7 @@ export default class Player extends GameComponent {
                     }
 
                 const pos = TileToPixel(this.position);
-                gsap.to(this.anim, .5, {
+                gsap.to(this.anim, this.speed, {
                     x: pos.x, y: pos.y, ease: Linear.easeNone,
                     onUpdate: () => this.camera.MoveTo(this.anim),
                     onComplete: () => {
@@ -144,6 +162,7 @@ export default class Player extends GameComponent {
     }
 
     private OnNextRound(): void {
+        this.springs.Reset();
         this.state = PlayerState.IDLE;
     }
 }
