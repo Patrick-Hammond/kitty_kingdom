@@ -1,10 +1,10 @@
 import gsap, {Linear, Power1, Power3} from "gsap";
 import {AnimatedSprite} from "pixi.js";
 import GameComponent from "@breakspace/GameComponent";
-import {Vec2, Vec2Like} from "@lib/math/Geometry";
+import {Vec2} from "@lib/math/Geometry";
 import {Direction} from "@lib/utils/Types";
-import {PLAYER_MOVED, ROUND_FINISHED, NEXT_ROUND} from "../../GameEvents";
-import {TileToPixel} from "../map/Map";
+import {PLAYER_MOVED, LEVEL_FINISHED, LEVEL_START} from "../../GameEvents";
+import {TileToPixel, PlayerHomeLocation} from "../map/Map";
 import Camera from "breakspace/src/breakspace/display/Camera";
 import Map from "../map/Map";
 import Springs from "../items/Springs";
@@ -14,6 +14,7 @@ import { SoundInstance } from "breakspace/src/breakspace/sound/Sound";
 import { Wait } from "breakspace/src/_lib/utils/Timing";
 import { NullFunction } from "breakspace/src/_lib/patterns/FunctionUtils";
 import { ColorReplaceFilter } from "pixi-filters";
+import { RemoveFromParent } from "breakspace/src/breakspace/display/Utils";
 
 enum PlayerState {
     IDLE, MOVING, FALLING, DISABLED
@@ -23,6 +24,7 @@ export default class Player extends GameComponent {
 
     private playerControl: PlayerControl;
     private anim: AnimatedSprite;
+    private flame: AnimatedSprite;
     private position = new Vec2();
     private state: PlayerState;
     private springs: Springs;
@@ -41,14 +43,18 @@ export default class Player extends GameComponent {
         this.anim.animationSpeed = 0.1;
         this.root.addChild(this.anim);
 
+        this.flame = this.assetFactory.CreateAnimatedSprite("flame");
+        this.flame.animationSpeed = 0.1;
+        this.flame.position.set(25, -28);
+
         this.springs = new Springs();
         this.playerControl = new PlayerControl(0);
 
         this.gallopSound = this.game.sound.PlaySprite("sounds", "move");
         this.gallopSound.muted = true;
 
-        this.game.dispatcher.on(NEXT_ROUND, this.OnNextRound, this);
-        this.game.dispatcher.on(ROUND_FINISHED, this.OnRoundFinished, this);
+        this.game.dispatcher.on(LEVEL_START, this.OnLevelStart, this);
+        this.game.dispatcher.on(LEVEL_FINISHED, this.OnLevelFinished, this);
     }
 
     get Springs(): Springs {
@@ -59,12 +65,18 @@ export default class Player extends GameComponent {
         return this.position;
     }
 
-    Start(position: Vec2Like): void {
+    private OnLevelStart(): void {
+        this.game.ticker.add(this.OnUpdate, this);
+
         this.state = PlayerState.IDLE;
-        this.position.Copy(position);
+        this.position.Copy(PlayerHomeLocation);
         const pos = TileToPixel(this.position);
         this.anim.position.set(pos.x, pos.y);
         this.camera.MoveTo(this.anim);
+    }
+
+    private OnLevelFinished(): void {
+        this.state = PlayerState.DISABLED;
     }
 
     HitSpring(): void {
@@ -96,9 +108,13 @@ export default class Player extends GameComponent {
         this.speedCancel();
         this.speed = 0.2;
         this.anim.filters = [this.speedFilter];
+        this.anim.addChild(this.flame);
+        this.flame.gotoAndPlay(0);
         this.speedCancel = Wait(10000, () => {
             this.speed = 0.5;
             this.anim.filters = null;
+            this.flame.stop();
+            RemoveFromParent(this.flame);
         });
     }
 
@@ -155,14 +171,5 @@ export default class Player extends GameComponent {
 
     private DropSpring() : void {
         this.springs.Drop(this.position, 1);
-    }
-
-    private OnRoundFinished(): void {
-        this.state = PlayerState.DISABLED;
-    }
-
-    private OnNextRound(): void {
-        this.springs.Reset();
-        this.state = PlayerState.IDLE;
     }
 }

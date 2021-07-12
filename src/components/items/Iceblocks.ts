@@ -9,7 +9,7 @@ import { RemoveFromParent } from "@breakspace/display/Utils";
 import { Wait } from "breakspace/src/_lib/utils/Timing";
 import { RandomInt } from "breakspace/src/_lib/math/Utils";
 import { NullFunction } from "breakspace/src/_lib/patterns/FunctionUtils";
-import { NEXT_ROUND, ROUND_FINISHED } from "GameEvents";
+import { LEVEL_START, LEVEL_FINISHED } from "GameEvents";
 
 export default class Iceblocks extends GameComponent {
 
@@ -24,10 +24,8 @@ export default class Iceblocks extends GameComponent {
 
     protected OnInitialise(): void {
 
-        this.game.dispatcher.on(ROUND_FINISHED, this.OnRoundFinished, this);
-        this.game.dispatcher.on(NEXT_ROUND, this.OnNextRound, this);
-
-        this.Drop(this.map.GetRandomPosition(), 2);
+        this.game.dispatcher.on(LEVEL_FINISHED, this.OnRoundFinished, this);
+        this.game.dispatcher.on(LEVEL_START, this.OnNextRound, this);
     }
 
     Drop(position: Vec2Like, max: number): boolean {

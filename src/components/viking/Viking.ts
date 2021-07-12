@@ -3,17 +3,18 @@ import {AnimatedSprite} from "pixi.js";
 import {FindShortestPath, SearchNode, FindClosestNode} from "@lib/algorithms/PathSearch";
 import {Callback} from "@breakspace/display/Utils";
 import GameComponent from "@breakspace/GameComponent";
-import {Vec2, Vec2Like} from "@lib/math/Geometry";
+import {Vec2} from "@lib/math/Geometry";
 import {NullFunction} from "@lib/patterns/FunctionUtils";
 import {Cancel, Wait} from "@lib/utils/Timing";
 import {Direction} from "@lib/utils/Types";
 import {PathTileType} from "../../Constants";
-import {CAT_FOLLOWING, VIKING_MOVED, CAT_POSITIONS, ROUND_FINISHED, NEXT_ROUND} from "../../GameEvents";
+import {CAT_FOLLOWING, VIKING_MOVED, CAT_POSITIONS, LEVEL_FINISHED, LEVEL_START} from "../../GameEvents";
 import {TileToPixel, VikingHomeLocation, VikingWayPoints} from "../map/Map";
 import Map from "../map/Map";
 import Springs from "../items/Springs";
 import { SoundInstance } from "breakspace/src/breakspace/sound/Sound";
 import { RandomInt } from "breakspace/src/_lib/math/Utils";
+import { ColorReplaceFilter } from "pixi-filters";
 
 enum VikingState {
     PATROLLING, END_PATROL, GOING_HOME, FALLING, DISABLED
@@ -30,6 +31,7 @@ export default class Viking extends GameComponent {
     private springs: Springs;
     private gallopSound: SoundInstance;
     private speed: number = 0.75;
+    private speedFilter = new ColorReplaceFilter(0x744824, 0xb81600);
 
     public constructor(private map: Map) {
         super();
@@ -49,20 +51,33 @@ export default class Viking extends GameComponent {
 
         this.game.dispatcher.on(CAT_FOLLOWING, this.OnCatFollowing, this);
         this.game.dispatcher.on(CAT_POSITIONS, (cats) => this.catPositions = cats);
-        this.game.dispatcher.on(ROUND_FINISHED, this.OnRoundFinished, this);
-        this.game.dispatcher.on(NEXT_ROUND, this.OnNextRound, this);
+
+        this.game.dispatcher.on(LEVEL_START, this.OnLevelStart, this);
+        this.game.dispatcher.on(LEVEL_FINISHED, this.OnLevelFinished, this);
     }
 
     get Springs(): Springs {
         return this.springs;
     }
 
-    Start(position: Vec2Like): void {
-        this.position.Copy(position);
+    private OnLevelStart(): void {
+        this.position.Copy(VikingHomeLocation);
         const pos = TileToPixel(this.position);
         this.anim.position.set(pos.x, pos.y);
         this.Patrol();
     }
+
+    private OnLevelFinished(): void {
+        this.state = VikingState.DISABLED;
+    }
+
+    /*
+    private Reset(): void {
+        this.springs.Reset();
+        this.cancelDelayedPatrol();
+        gsap.killTweensOf(this.anim);
+    }
+    */
 
     HitSpring(): void {
         this.cancelDelayedPatrol();
@@ -86,8 +101,12 @@ export default class Viking extends GameComponent {
     }
 
     HitIceblock(): void {
-        this.speed *= 0.5;
-        Wait(5000, () => this.speed = 0.75);
+        this.speed = 0.1;
+        this.anim.filters = [this.speedFilter];
+        Wait(10000, () => {
+            this.speed = 0.75;
+            this.anim.filters = null;
+        });
     }
 
     DropSpring() : void {
@@ -209,17 +228,5 @@ export default class Viking extends GameComponent {
         this.MoveTo(VikingHomeLocation.x, VikingHomeLocation.y, () => {
             this.cancelDelayedPatrol = Wait(5000, () => this.ChaseCat());
         });
-    }
-
-    private OnRoundFinished(): void {
-        this.state = VikingState.DISABLED;
-    }
-
-    private OnNextRound(): void {
-        this.springs.Reset();
-        this.cancelDelayedPatrol();
-        gsap.killTweensOf(this.anim);
-
-        this.Start(VikingHomeLocation);
     }
 }

@@ -2,7 +2,7 @@ import {AdjustmentFilter} from "pixi-filters";
 import {RenderTexture, Sprite} from "pixi.js";
 import GameComponent from "@breakspace/GameComponent";
 import {RGB} from "@lib/utils/Types";
-import {CAT_HOME_PLAYER, NEXT_ROUND} from "../../GameEvents";
+import {CAT_HOME_PLAYER, LEVEL_START} from "../../GameEvents";
 import { PlayerHomeLocation, TileToPixel } from "components/map/Map";
 
 export default class HomePlayer extends GameComponent {
@@ -12,7 +12,13 @@ export default class HomePlayer extends GameComponent {
     private cats: Sprite[] = [];
     private catCount: number = 0;
 
-    protected OnInitialise(): void {
+    constructor() {
+        super();
+        this.game.dispatcher.on(CAT_HOME_PLAYER, this.OnCatHome, this);
+        this.game.dispatcher.on(LEVEL_START, this.OnLevelStart, this);
+    }
+
+    private OnLevelStart(): void {
         this.cat = this.assetFactory.CreateSprite("cat_sit");
         this.cat.filters = [this.tint];
 
@@ -27,9 +33,6 @@ export default class HomePlayer extends GameComponent {
             cat.y = [40, 40, 18, -8, 67, 32][i];
             this.cats.push(cat);
         }
-
-        this.game.dispatcher.on(CAT_HOME_PLAYER, this.OnCatHome, this);
-        this.game.dispatcher.on(NEXT_ROUND, this.OnRoundStart, this);
     }
 
     private OnCatHome(tint: RGB): void {
@@ -46,10 +49,5 @@ export default class HomePlayer extends GameComponent {
 
             this.game.sound.PlaySprite("sounds", "home");
         }
-    }
-
-    private OnRoundStart(): void {
-        this.root.removeChildren();
-        this.catCount = 0;
     }
 }

@@ -1,0 +1,15 @@
+{
+    "rootPath":"/assets/",
+    "chunks":
+    [
+        {
+            "name":"main",
+            "fonts":["numbers-export.fnt"],
+            "sounds":["sounds/sounds.json"],
+            "spritesheets":["spritesheet.json"]
+        }
+    ],
+    "data":{
+        "levelNames":["level2","level1"]
+    }
+}

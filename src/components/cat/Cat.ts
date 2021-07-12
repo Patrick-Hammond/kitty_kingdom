@@ -125,11 +125,11 @@ export default class Cat extends GameComponent {
         const homeViking = this.position.Equals(VikingHomeLocation);
         const isHome = homePlayer || homeViking;
         if (isHome) {
-            Wait(200, () => this.game.sound.PlaySprite("sounds", "meow1"));
             this.state = CatState.HOME;
             this.Destroy();
             this.game.dispatcher.emit(homePlayer ? CAT_HOME_PLAYER : CAT_HOME_VIKING,
                 {r: this.tint.red, g: this.tint.green, b: this.tint.blue}, this);
+            Wait(200, () => this.game.sound.PlaySprite("sounds", "meow1"));
         }
         return isHome;
     }

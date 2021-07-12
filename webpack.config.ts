@@ -1,3 +1,4 @@
+
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -18,9 +19,9 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Kitty Kingdom',
-      template: './assets/index.template'
+      template: './_assets/index.template'
     }),
-    new CopyWebpackPlugin([{ from: './assets', to: 'assets' }]),
+    new CopyWebpackPlugin([{ from: './_assets', to: 'assets' }]),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin()
   ],

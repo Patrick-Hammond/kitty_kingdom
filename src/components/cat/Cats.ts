@@ -2,7 +2,7 @@ import GameComponent from "@breakspace/GameComponent";
 import ObjectPool from "@lib/patterns/ObjectPool";
 import Cat from "./Cat";
 import Map from "../map/Map";
-import {CAT_POSITIONS, CAT_HOME_PLAYER, CAT_HOME_VIKING, NEXT_ROUND} from "../../GameEvents";
+import {CAT_POSITIONS, CAT_HOME_PLAYER, CAT_HOME_VIKING, LEVEL_START} from "../../GameEvents";
 import { GetInterval, Wait } from "@lib/utils/Timing";
 import { Vec2Like } from "@lib/math/Geometry";
 
@@ -20,10 +20,11 @@ export default class Cats extends GameComponent {
 
         this.game.dispatcher.on(CAT_HOME_PLAYER, (tint, cat) => this.OnCatHome(cat));
         this.game.dispatcher.on(CAT_HOME_VIKING, (tint, cat) => this.OnCatHome(cat));
-        this.game.dispatcher.on(NEXT_ROUND, this.OnRoundStart, this);
+
+        this.game.dispatcher.on(LEVEL_START, this.OnLevelStart, this);
     }
 
-    Start(): void {
+    private OnLevelStart(): void {
         this.catDispatched = 0;
 
         GetInterval(5000, this.DispatchNext, this);
@@ -49,10 +50,5 @@ export default class Cats extends GameComponent {
 
     private OnCatHome(cat: Cat) : void {
         this.cats.Put(cat);
-    }
-
-    private OnRoundStart(): void {
-        this.catDispatched = 0;
-        this.cats.RestoreAll();
     }
 }

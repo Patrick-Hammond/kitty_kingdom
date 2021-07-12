@@ -28,9 +28,11 @@ export default class Map extends GameComponent implements ISearchGraph<Tile> {
 
     private randomPositions: Vec2Like[] = [];
     private blockedTile = new Tile(new Vec2(), "-1", null);
+    private model: TileMapModel;
 
-    public constructor(private model: TileMapModel) {
-        super();
+    SetMapModel(model: TileMapModel) {
+
+        this.model = model;
 
         model.layers.forEach(layer => {
 
