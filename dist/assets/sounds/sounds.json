@@ -1,0 +1,75 @@
+{
+  "resources": [
+    "sounds.ogg",
+    "sounds.m4a",
+    "sounds.mp3",
+    "sounds.ac3"
+  ],
+  "spritemap": {
+    "home": {
+      "start": 0,
+      "end": 0.9506802721088435,
+      "loop": false
+    },
+    "horse": {
+      "start": 1.25,
+      "end": 4.1171201814058955,
+      "loop": true
+    },
+    "lose": {
+      "start": 4.5,
+      "end": 4.998866213151928,
+      "loop": false
+    },
+    "meow1": {
+      "start": 5.75,
+      "end": 6.89514739229025,
+      "loop": false
+    },
+    "meow2": {
+      "start": 8,
+      "end": 9.313900226757369,
+      "loop": false
+    },
+    "move": {
+      "start": 10.25,
+      "end": 11.382925170068027,
+      "loop": true
+    },
+    "neigh1": {
+      "start": 12.5,
+      "end": 14.594421768707484,
+      "loop": false
+    },
+    "neigh2": {
+      "start": 15.75,
+      "end": 16.802607709750568,
+      "loop": false
+    },
+    "nextlevel": {
+      "start": 18,
+      "end": 20.233786848072562,
+      "loop": false
+    },
+    "slurp": {
+      "start": 21.25,
+      "end": 22.007845804988662,
+      "loop": false
+    },
+    "theme": {
+      "start": 22.5,
+      "end": 89.09399092970521,
+      "loop": true
+    },
+    "ambiance": {
+      "start": 89.75,
+      "end": 128.2171882086168,
+      "loop": true
+    },
+    "boing": {
+      "start": 129,
+      "end": 131.13453514739228,
+      "loop": false
+    }
+  }
+}

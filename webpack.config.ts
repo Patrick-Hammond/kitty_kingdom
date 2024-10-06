@@ -13,10 +13,9 @@ module.exports = {
   devServer: {
     contentBase: './dist',
     hot: true,
-    port: 4200
+    port: 5501
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Kitty Kingdom',
       template: './_assets/index.template'
@@ -29,7 +28,8 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'awesome-typescript-loader'
+        loader: 'ts-loader',
+        options: { allowTsInNodeModules: true }
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
