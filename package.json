@@ -1,6 +1,6 @@
 {
   "name": "kittykingdom",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "",
   "author": "patrick hammond",
   "description": "",
@@ -9,12 +9,11 @@
     "npm": "~5.8.0"
   },
   "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack",
-    "deploy": "webpack --config webpack.prod.config.ts",
+    "start": "esbuild ./src/Main.ts --bundle --watch --outfile=./dist/out.js",
+    "build": "esbuild ./src/Main.ts --bundle --outfile=./dist/out.js",
+    "deploy": "esbuild ./src/Main.ts --bundle --outfile=./dist/out.js --minify --sourcemap --target=chrome58,firefox57,safari11,edge16",
     "npm-clean-install": "rmdir /s node_modules && npm cache verify && npm i",
-    "update-libs": "npm uninstall breakspace && npm install Patrick-Hammond/breakspace",
-    "stats": "webpack --json > stats.json"
+    "update-libs": "npm uninstall breakspace && npm install Patrick-Hammond/breakspace"
   },
   "keywords": [],
   "dependencies": {
@@ -31,18 +30,8 @@
   },
   "devDependencies": {
     "@types/node": "^13.11.0",
-    "awesome-typescript-loader": "5.0.0-1",
-    "clean-webpack-plugin": "0.1.19",
-    "copy-webpack-plugin": "^5.1.1",
-    "file-loader": "1.1.11",
-    "html-webpack-plugin": "3.1.0",
-    "serialize-javascript": ">=2.1.1",
-    "tsconfig-paths-webpack-plugin": "3.0.2",
+    "esbuild": "^0.11.16",
     "tslint": "^6.1.1",
-    "typescript": "^3.8.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "2.0.13",
-    "webpack-dev-server": "^3.11.0",
-    "webpack-game-asset-plugin": "^0.18.2"
+    "typescript": "^3.8.3"
   }
 }
